@@ -10,7 +10,6 @@ export type RenderTree = {
   name: string;
   children: RenderTree[];
   isButtonsVisible: boolean;
-  isSelected?: boolean;
 };
 
 type TreeProps = {
@@ -22,8 +21,7 @@ type TreeProps = {
   handleDeleteButtonClick: () => void;
   dispatch: React.Dispatch<any>;
   handleAddButtonClick: () => void;
-  isSelected: string;
-  setSelectedId: React.Dispatch<React.SetStateAction<string>>;
+  handleIsNodeSelected: (nodeId: string) => boolean;
 };
 
 const Tree = (props: TreeProps) => {
@@ -33,11 +31,10 @@ const Tree = (props: TreeProps) => {
     handleDeleteButtonClick,
     handleAddButtonClick,
     dispatch,
-    isSelected,
-    setSelectedId,
+    handleIsNodeSelected,
   } = props;
 
-  const TreeItem = () => {
+  const TreeItem = (node) => {
     return (
       <Box
         display="flex"
@@ -48,16 +45,9 @@ const Tree = (props: TreeProps) => {
         alignItems="center"
       >
         <Box>
-          <TextField
-            defaultValue={treeData.name}
-            onBlur={(e) => handleTextFieldChange(e, treeData.id)}
-            // onFocus={() => {
-            //   console.log("onFocus");
-            //   setSelectedId(treeData.id);
-            // }}
-          />
+          <TextField />
         </Box>
-        {treeData.isButtonsVisible && !isSelected && (
+        {treeData.isButtonsVisible && (
           <Box display="flex" ml="auto" alignItems="center">
             <Box
               display="flex"
@@ -94,25 +84,9 @@ const Tree = (props: TreeProps) => {
   };
 
   return (
-    <>
-      {treeData.id && <TreeItem />}
-      {Array.isArray(treeData.children) && treeData.children.length > 0 && (
-        <Box ml={1}>
-          {treeData.children.map((node: RenderTree) => (
-            <Tree
-              key={node.id}
-              treeData={node}
-              handleTextFieldChange={handleTextFieldChange}
-              handleDeleteButtonClick={handleDeleteButtonClick}
-              dispatch={dispatch}
-              handleAddButtonClick={handleAddButtonClick}
-              setSelectedId={setSelectedId}
-              isSelected={isSelected}
-            />
-          ))}
-        </Box>
-      )}
-    </>
+    <Box pl={1}>
+      <TreeItem />
+    </Box>
   );
 };
 

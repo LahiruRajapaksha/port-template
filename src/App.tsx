@@ -5,20 +5,22 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import Tree, { RenderTree } from "./components/TreeView";
+import { RenderTree } from "./components/TreeView";
 import { TreeViewInitState, TreeViewReducer } from "./reducers/TreeViewReducer";
 import AddRemoveButton from "./components/AddRemoveButton";
+import CustomTree from "./components/Tree";
 
 function App() {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [state, dispatch] = useReducer(TreeViewReducer, TreeViewInitState);
-  const { treeData, selectedNodeId } = state;
-  const [selectedId, setSelectedId] = useState<string>("");
+  const { treeData } = state;
+  const [selectedNodeId, setSelectedNodeId] = useState<string>("");
   const addNewNode = (
     nodeData: RenderTree[],
     newNode: RenderTree
   ): RenderTree[] => {
     return nodeData.map((node) => {
+      console.log("updatedNodes");
       if (node.id === selectedNodeId) {
         return {
           ...node,
@@ -39,23 +41,20 @@ function App() {
     const id = Math.ceil(Math.random() * 1000).toString();
     const newNode: RenderTree = {
       id: id,
-      name: "",
+      name: `Node ${id}`,
       children: [],
       isButtonsVisible: true,
-      isSelected: false,
     };
 
     const updateNodesRecursive = (nodes: RenderTree[]): RenderTree[] => {
       return nodes.map((node) => ({
         ...node,
         isButtonsVisible: false,
-        isSelected: false,
         children: updateNodesRecursive(node.children),
       }));
     };
-
+    console.log("Clicked");
     const updatedNodes = updateNodesRecursive(treeData);
-
     dispatch({
       type: "ADD_TREE_NODE",
       payload:
@@ -63,6 +62,7 @@ function App() {
           ? [...updatedNodes, newNode]
           : addNewNode(updatedNodes, newNode),
     });
+    setSelectedNodeId("");
   };
 
   const deleteNode = (nodeData: RenderTree[]): RenderTree[] => {
@@ -81,10 +81,7 @@ function App() {
       type: "DELETE_TREE_NODE",
       payload: deleteNode([...treeData]),
     });
-    dispatch({
-      type: "SET_SELECTED_NODE_ID",
-      payload: "",
-    });
+    setSelectedNodeId("");
   };
 
   const updateNodeNameData = (
@@ -106,27 +103,6 @@ function App() {
       }
       return node;
     });
-  };
-
-  const handleTextFieldChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    nodeId: string
-  ) => {
-    console.log("handleTextFieldChange");
-    dispatch({
-      type: "SET_SELECTED_NODE_ID",
-      payload: nodeId,
-    });
-    dispatch({
-      type: "UPDATE_TREE_NODE_NAME",
-      payload: updateNodeNameData([...treeData], nodeId, e.target.value),
-    });
-  };
-
-  const handleIsNodeSelected = (nodeId: string) => {
-    if (nodeId === selectedNodeId) {
-      return true;
-    }
   };
 
   return (
@@ -155,14 +131,6 @@ function App() {
                 >
                   +
                 </AddRemoveButton>
-                <AddRemoveButton
-                  variant="outlined"
-                  onClick={handleDeleteButtonClick}
-                  padding={2}
-                  margin="3px"
-                >
-                  -
-                </AddRemoveButton>
               </Box>
               <Box display="flex" justifyContent="space-between">
                 <AddRemoveButton
@@ -184,18 +152,14 @@ function App() {
               </Box>
             </Box>
             <Box p={1}>
-              {treeData.map((node) => (
-                <Tree
-                  key={node.id}
-                  treeData={node}
-                  handleTextFieldChange={handleTextFieldChange}
-                  handleDeleteButtonClick={handleDeleteButtonClick}
-                  dispatch={dispatch}
-                  handleAddButtonClick={handleAddButtonClick}
-                  isSelected={selectedId}
-                  setSelectedId={setSelectedId}
-                />
-              ))}
+              <CustomTree
+                treeData={treeData}
+                dispatch={dispatch}
+                selectedNodeId={selectedNodeId}
+                setSelectedNodeId={setSelectedNodeId}
+                handleDeleteButtonClick={handleDeleteButtonClick}
+                handleAddButtonClick={handleAddButtonClick}
+              />
             </Box>
           </AccordionDetails>
         </Accordion>
