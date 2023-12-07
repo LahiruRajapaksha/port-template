@@ -5,16 +5,16 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import { RenderTree } from "./components/TreeView";
 import { TreeViewInitState, TreeViewReducer } from "./reducers/TreeViewReducer";
 import AddRemoveButton from "./components/AddRemoveButton";
-import CustomTree from "./components/Tree";
+import CustomTree, { RenderTree } from "./components/Tree";
+import { TreeViewReducerActionTypes } from "./actions/treeViewReducerActions";
 
 function App() {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [state, dispatch] = useReducer(TreeViewReducer, TreeViewInitState);
-  const { treeData } = state;
-  const [selectedNodeId, setSelectedNodeId] = useState<string>("");
+  const { treeData, selectedNodeId } = state;
+
   const addNewNode = (
     nodeData: RenderTree[],
     newNode: RenderTree
@@ -53,16 +53,20 @@ function App() {
         children: updateNodesRecursive(node.children),
       }));
     };
-    console.log("Clicked");
+
     const updatedNodes = updateNodesRecursive(treeData);
+
     dispatch({
-      type: "ADD_TREE_NODE",
+      type: TreeViewReducerActionTypes.ADD_TREE_NODE,
       payload:
         selectedNodeId === ""
           ? [...updatedNodes, newNode]
           : addNewNode(updatedNodes, newNode),
     });
-    setSelectedNodeId("");
+    dispatch({
+      type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
+      payload: "",
+    });
   };
 
   const deleteNode = (nodeData: RenderTree[]): RenderTree[] => {
@@ -78,32 +82,35 @@ function App() {
 
   const handleDeleteButtonClick = () => {
     dispatch({
-      type: "DELETE_TREE_NODE",
+      type: TreeViewReducerActionTypes.DELETE_TREE_NODE,
       payload: deleteNode([...treeData]),
     });
-    setSelectedNodeId("");
-  };
-
-  const updateNodeNameData = (
-    nodeData: RenderTree[],
-    nodeId: string,
-    newTextValue: string
-  ): RenderTree[] => {
-    return nodeData.map((node) => {
-      if (node.id === nodeId) {
-        return {
-          ...node,
-          name: newTextValue,
-        };
-      } else if (node.children.length > 0) {
-        return {
-          ...node,
-          children: updateNodeNameData(node.children, nodeId, newTextValue),
-        };
-      }
-      return node;
+    dispatch({
+      type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
+      payload: "",
     });
   };
+
+  // const updateNodeNameData = (
+  //   nodeData: RenderTree[],
+  //   nodeId: string,
+  //   newTextValue: string
+  // ): RenderTree[] => {
+  //   return nodeData.map((node) => {
+  //     if (node.id === nodeId) {
+  //       return {
+  //         ...node,
+  //         name: newTextValue,
+  //       };
+  //     } else if (node.children.length > 0) {
+  //       return {
+  //         ...node,
+  //         children: updateNodeNameData(node.children, nodeId, newTextValue),
+  //       };
+  //     }
+  //     return node;
+  //   });
+  // };
 
   return (
     <Box width={1} display="flex" justifyContent="center" height={1} p={1}>
@@ -156,7 +163,6 @@ function App() {
                 treeData={treeData}
                 dispatch={dispatch}
                 selectedNodeId={selectedNodeId}
-                setSelectedNodeId={setSelectedNodeId}
                 handleDeleteButtonClick={handleDeleteButtonClick}
                 handleAddButtonClick={handleAddButtonClick}
               />

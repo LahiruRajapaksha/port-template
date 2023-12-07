@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { TreeView } from "@mui/x-tree-view/TreeView";
@@ -9,6 +9,10 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Switch from "@mui/material/Switch";
 import AddRemoveButton from "./AddRemoveButton";
+import {
+  TreeViewReducerActionTypes,
+  TreeViewReducerActions,
+} from "../actions/treeViewReducerActions";
 
 export type RenderTree = {
   id: string;
@@ -19,9 +23,8 @@ export type RenderTree = {
 
 type CustomTreeProps = {
   treeData: RenderTree[];
-  dispatch: React.Dispatch<any>;
+  dispatch: React.Dispatch<TreeViewReducerActions>;
   selectedNodeId: string;
-  setSelectedNodeId: React.Dispatch<React.SetStateAction<string>>;
   handleAddButtonClick: () => void;
   handleDeleteButtonClick: () => void;
 };
@@ -33,20 +36,23 @@ const CustomTree = (props: CustomTreeProps) => {
     dispatch,
     handleDeleteButtonClick,
     handleAddButtonClick,
-    setSelectedNodeId,
   } = props;
-  const [isReadOnly, setIsReadOnly] = useState<boolean>(false);
+
+  const textInput = useRef<HTMLInputElement>(null); // Add useRef
+  console.log("treeData", treeData);
+
   const handleSelect = (event: React.SyntheticEvent, nodeId: string) => {
-    setSelectedNodeId(nodeId);
+    dispatch({
+      type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
+      payload: nodeId,
+    });
   };
-  const handleReadOnly = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsReadOnly(event.target.checked);
-  };
+
   const TreeNode = ({ node }: { node: RenderTree }) => {
     return (
       <Box display="flex" width={1} pl={1} pb={1} alignItems="center">
         <Box>
-          <TextField defaultValue={""} />
+          <TextField defaultValue={node.name} inputRef={textInput} />
         </Box>
         {(selectedNodeId === node.id ||
           (node.isButtonsVisible && selectedNodeId === "")) && (
@@ -61,7 +67,7 @@ const CustomTree = (props: CustomTreeProps) => {
             >
               <Box display="flex" alignItems="center">
                 <Typography>Read Only</Typography>
-                <Switch onChange={handleReadOnly} />
+                <Switch />
               </Box>
               <IconButton
                 aria-label="delete"
