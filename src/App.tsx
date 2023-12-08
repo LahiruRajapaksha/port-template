@@ -1,5 +1,4 @@
-import { useState, useReducer } from "react";
-import "./App.css";
+import { useState, useReducer, useRef } from "react";
 import { Box, Typography } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -14,13 +13,13 @@ function App() {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [state, dispatch] = useReducer(TreeViewReducer, TreeViewInitState);
   const { treeData, selectedNodeId } = state;
+  const selectedNodeRef = useRef<string>("");
 
   const addNewNode = (
     nodeData: RenderTree[],
     newNode: RenderTree
   ): RenderTree[] => {
     return nodeData.map((node) => {
-      console.log("updatedNodes");
       if (node.id === selectedNodeId) {
         return {
           ...node,
@@ -63,32 +62,11 @@ function App() {
           ? [...updatedNodes, newNode]
           : addNewNode(updatedNodes, newNode),
     });
-    dispatch({
-      type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
-      payload: "",
-    });
-  };
-
-  const deleteNode = (nodeData: RenderTree[]): RenderTree[] => {
-    return nodeData.filter((node) => {
-      if (node.id === selectedNodeId) {
-        return false;
-      } else if (node.children.length > 0) {
-        node.children = deleteNode(node.children);
-      }
-      return true;
-    });
-  };
-
-  const handleDeleteButtonClick = () => {
-    dispatch({
-      type: TreeViewReducerActionTypes.DELETE_TREE_NODE,
-      payload: deleteNode([...treeData]),
-    });
-    dispatch({
-      type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
-      payload: "",
-    });
+    // dispatch({
+    //   type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
+    //   payload: "",
+    // });
+    selectedNodeRef.current = "";
   };
 
   // const updateNodeNameData = (
@@ -163,7 +141,7 @@ function App() {
                 treeData={treeData}
                 dispatch={dispatch}
                 selectedNodeId={selectedNodeId}
-                handleDeleteButtonClick={handleDeleteButtonClick}
+                selectedNodeRef={selectedNodeRef}
                 handleAddButtonClick={handleAddButtonClick}
               />
             </Box>

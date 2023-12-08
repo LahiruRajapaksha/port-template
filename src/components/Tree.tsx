@@ -1,4 +1,5 @@
-import { useRef } from "react";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { useRef, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { TreeView } from "@mui/x-tree-view/TreeView";
@@ -26,7 +27,7 @@ type CustomTreeProps = {
   dispatch: React.Dispatch<TreeViewReducerActions>;
   selectedNodeId: string;
   handleAddButtonClick: () => void;
-  handleDeleteButtonClick: () => void;
+  selectedNodeRef: React.MutableRefObject<string>;
 };
 
 const CustomTree = (props: CustomTreeProps) => {
@@ -34,28 +35,52 @@ const CustomTree = (props: CustomTreeProps) => {
     treeData,
     selectedNodeId,
     dispatch,
-    handleDeleteButtonClick,
     handleAddButtonClick,
+    selectedNodeRef,
   } = props;
-
-  const textInput = useRef<HTMLInputElement>(null); // Add useRef
-  console.log("treeData", treeData);
+  const [selNodeId, setSelNodeId] = useState<string>("");
+  console.log("selectedNodeRef.current", selectedNodeRef.current);
 
   const handleSelect = (event: React.SyntheticEvent, nodeId: string) => {
+    selectedNodeRef.current = nodeId;
+    setSelNodeId(nodeId);
+    // dispatch({
+    //   type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
+    //   payload: nodeId,
+    // });
+  };
+
+  const deleteNode = (nodeData: RenderTree[]): RenderTree[] => {
+    return nodeData.filter((node) => {
+      if (node.id === selectedNodeRef.current) {
+        return false;
+      } else if (node.children.length > 0) {
+        node.children = deleteNode(node.children);
+      }
+      return true;
+    });
+  };
+
+  const handleDeleteButtonClick = () => {
+    dispatch({
+      type: TreeViewReducerActionTypes.DELETE_TREE_NODE,
+      payload: deleteNode([...treeData]),
+    });
     dispatch({
       type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
-      payload: nodeId,
+      payload: "",
     });
+    selectedNodeRef.current = "";
   };
 
   const TreeNode = ({ node }: { node: RenderTree }) => {
     return (
       <Box display="flex" width={1} pl={1} pb={1} alignItems="center">
         <Box>
-          <TextField defaultValue={node.name} inputRef={textInput} />
+          <TextField defaultValue={node.name} />
         </Box>
-        {(selectedNodeId === node.id ||
-          (node.isButtonsVisible && selectedNodeId === "")) && (
+        {(selNodeId === node.id ||
+          (node.isButtonsVisible && selectedNodeRef.current === "")) && (
           <Box display="flex" ml="auto" alignItems="center">
             <Box
               display="flex"
