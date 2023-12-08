@@ -65,8 +65,8 @@ const RecursiveComponent = (props: RecursiveComponentProps) => {
               <CustomTextField onClick={() => setselectedNodeId(item.id)} />
             </Box>
 
-            {(selectedNodeId === item.id ||
-              (item.isButtonsVisible && selectedNodeId === "")) && (
+            {((selectedNodeId === item.id && item.isButtonsVisible) ||
+              item.isButtonsVisible) && (
               <Box display="flex" ml="auto" alignItems="center">
                 <Box
                   display="flex"

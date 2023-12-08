@@ -1,132 +1,22 @@
-import { useState, useReducer } from "react";
-import { Box, Typography } from "@mui/material";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import { TreeViewInitState, TreeViewReducer } from "./reducers/TreeViewReducer";
-import AddRemoveButton from "./components/AddRemoveButton";
-import { TreeViewReducerActionTypes } from "./actions/treeViewReducerActions";
-import RecursiveComponent, { RenderTree } from "./components/NewTree";
+import { Box } from "@mui/material";
+import PortTemplate from "./views/PortTemplate";
+import Documents from "./views/Documents";
+import Fields from "./views/Fields";
 
 function App() {
-  const [expanded, setExpanded] = useState<boolean>(false);
-  const [state, dispatch] = useReducer(TreeViewReducer, TreeViewInitState);
-  const { treeData } = state;
-  const [selectedNodeId, setselectedNodeId] = useState("");
-
-  const addNewNode = (
-    nodeData: RenderTree[],
-    newNode: RenderTree
-  ): RenderTree[] => {
-    return nodeData.map((node) => {
-      if (node.id === selectedNodeId) {
-        return {
-          ...node,
-          children: [...node.children, newNode],
-          isButtonsVisible: false,
-        };
-      } else if (node.children.length > 0) {
-        return {
-          ...node,
-          children: addNewNode(node.children, newNode),
-        };
-      }
-      return node;
-    });
-  };
-  const handleAddButtonClick = () => {
-    const id = Math.ceil(Math.random() * 1000).toString();
-    const newNode: RenderTree = {
-      id: id,
-      name: "",
-      children: [],
-      isButtonsVisible: true,
-    };
-
-    const updateNodesRecursive = (nodes: RenderTree[]): RenderTree[] => {
-      return nodes.map((node) => ({
-        ...node,
-        isButtonsVisible: false,
-        children: updateNodesRecursive(node.children),
-      }));
-    };
-
-    const updatedNodes = updateNodesRecursive(treeData);
-
-    dispatch({
-      type: TreeViewReducerActionTypes.ADD_TREE_NODE,
-      payload:
-        selectedNodeId === ""
-          ? [...updatedNodes, newNode]
-          : addNewNode(updatedNodes, newNode),
-    });
-  };
-
   return (
-    <Box width={1} display="flex" justifyContent="center" height={1} p={1}>
+    <Box display="flex" justifyContent="center" height={1} alignItems="center">
       <Box
-        width="70%"
         display="flex"
+        alignItems="center"
         flexDirection="column"
-        justifyContent="center"
+        width="75%"
+        height="75%"
+        p={3}
       >
-        <Accordion
-          expanded={expanded}
-          onChange={() => setExpanded((prev) => !prev)}
-        >
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h5">Port Template</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Box display="flex" justifyContent="space-around">
-              <Box mr="auto" display="flex">
-                <AddRemoveButton
-                  variant="outlined"
-                  onClick={handleAddButtonClick}
-                  padding={2}
-                  margin="3px"
-                >
-                  +
-                </AddRemoveButton>
-              </Box>
-              <Box display="flex" justifyContent="space-between">
-                <AddRemoveButton
-                  variant="outlined"
-                  onClick={() => null}
-                  padding={2}
-                  margin="3px"
-                >
-                  Back
-                </AddRemoveButton>
-                <AddRemoveButton
-                  variant="contained"
-                  onClick={() => null}
-                  padding={2}
-                  margin="3px"
-                >
-                  Save
-                </AddRemoveButton>
-              </Box>
-            </Box>
-            <Box p={1}>
-              {/* <CustomTree
-                treeData={treeData}
-                dispatch={dispatch}
-                selectedNodeId={selectedNodeId}
-                handleAddButtonClick={handleAddButtonClick}
-                handleSelectedNodeChange={handleSelectedNodeChange}
-              /> */}
-              <RecursiveComponent
-                data={treeData}
-                handleAddButtonClick={handleAddButtonClick}
-                setselectedNodeId={setselectedNodeId}
-                selectedNodeId={selectedNodeId}
-                dispatch={dispatch}
-              />
-            </Box>
-          </AccordionDetails>
-        </Accordion>
+        <Fields />
+        <PortTemplate />
+        <Documents />
       </Box>
     </Box>
   );
