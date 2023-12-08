@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { TreeView } from "@mui/x-tree-view/TreeView";
@@ -26,8 +26,9 @@ type CustomTreeProps = {
   treeData: RenderTree[];
   dispatch: React.Dispatch<TreeViewReducerActions>;
   selectedNodeId: string;
-  handleAddButtonClick: () => void;
-  selectedNodeRef: React.MutableRefObject<string>;
+  handleAddButtonClick: (selectedNode: string) => void;
+  // selectedNodeRef: React.MutableRefObject<string>;
+  handleSelectedNodeChange: (nodeId: string) => void;
 };
 
 const CustomTree = (props: CustomTreeProps) => {
@@ -36,26 +37,36 @@ const CustomTree = (props: CustomTreeProps) => {
     selectedNodeId,
     dispatch,
     handleAddButtonClick,
-    selectedNodeRef,
+    // selectedNodeRef,
+    handleSelectedNodeChange,
   } = props;
   const [selNodeId, setSelNodeId] = useState<string>("");
-  console.log("selectedNodeRef.current", selectedNodeRef.current);
+  const nodeRefValue = useRef<string>("");
 
   const handleSelect = (event: React.SyntheticEvent, nodeId: string) => {
-    selectedNodeRef.current = nodeId;
-    setSelNodeId(nodeId);
-    // dispatch({
-    //   type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
-    //   payload: nodeId,
-    // });
+    if (treeData.length > 0) {
+      setSelNodeId(nodeId);
+      nodeRefValue.current = nodeId;
+      handleSelectedNodeChange(nodeId);
+    }
   };
 
-  const deleteNode = (nodeData: RenderTree[]): RenderTree[] => {
+  useEffect(() => {
+    return () => {
+      handleSelectedNodeChange("");
+      nodeRefValue.current = "";
+    };
+  }, [handleSelectedNodeChange]);
+
+  const deleteNode = (
+    nodeData: RenderTree[],
+    selectedNode: string
+  ): RenderTree[] => {
     return nodeData.filter((node) => {
-      if (node.id === selectedNodeRef.current) {
+      if (node.id === selectedNode) {
         return false;
       } else if (node.children.length > 0) {
-        node.children = deleteNode(node.children);
+        node.children = deleteNode(node.children, selectedNode);
       }
       return true;
     });
@@ -64,13 +75,8 @@ const CustomTree = (props: CustomTreeProps) => {
   const handleDeleteButtonClick = () => {
     dispatch({
       type: TreeViewReducerActionTypes.DELETE_TREE_NODE,
-      payload: deleteNode([...treeData]),
+      payload: deleteNode([...treeData], nodeRefValue.current),
     });
-    dispatch({
-      type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
-      payload: "",
-    });
-    selectedNodeRef.current = "";
   };
 
   const TreeNode = ({ node }: { node: RenderTree }) => {
@@ -80,7 +86,7 @@ const CustomTree = (props: CustomTreeProps) => {
           <TextField defaultValue={node.name} />
         </Box>
         {(selNodeId === node.id ||
-          (node.isButtonsVisible && selectedNodeRef.current === "")) && (
+          (node.isButtonsVisible && nodeRefValue.current === "")) && (
           <Box display="flex" ml="auto" alignItems="center">
             <Box
               display="flex"
@@ -104,7 +110,7 @@ const CustomTree = (props: CustomTreeProps) => {
             </Box>
             <AddRemoveButton
               variant="contained"
-              onClick={handleAddButtonClick}
+              onClick={() => handleAddButtonClick(node.id)}
               padding={2}
               margin="3px"
             >

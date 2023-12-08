@@ -20,7 +20,7 @@ function App() {
     newNode: RenderTree
   ): RenderTree[] => {
     return nodeData.map((node) => {
-      if (node.id === selectedNodeId) {
+      if (node.id === selectedNodeRef.current) {
         return {
           ...node,
           children: [...node.children, newNode],
@@ -36,7 +36,7 @@ function App() {
     });
   };
 
-  const handleAddButtonClick = () => {
+  const handleAddButtonClick = (selectedNode: string) => {
     const id = Math.ceil(Math.random() * 1000).toString();
     const newNode: RenderTree = {
       id: id,
@@ -58,7 +58,7 @@ function App() {
     dispatch({
       type: TreeViewReducerActionTypes.ADD_TREE_NODE,
       payload:
-        selectedNodeId === ""
+        selectedNode === ""
           ? [...updatedNodes, newNode]
           : addNewNode(updatedNodes, newNode),
     });
@@ -66,9 +66,12 @@ function App() {
     //   type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
     //   payload: "",
     // });
-    selectedNodeRef.current = "";
+    // selectedNodeRef.current = "";
   };
 
+  const handleSelectedNodeChange = (nodeId: string) => {
+    selectedNodeRef.current = nodeId;
+  };
   // const updateNodeNameData = (
   //   nodeData: RenderTree[],
   //   nodeId: string,
@@ -110,7 +113,7 @@ function App() {
               <Box mr="auto" display="flex">
                 <AddRemoveButton
                   variant="outlined"
-                  onClick={handleAddButtonClick}
+                  onClick={() => handleAddButtonClick(selectedNodeRef.current)}
                   padding={2}
                   margin="3px"
                 >
@@ -141,8 +144,9 @@ function App() {
                 treeData={treeData}
                 dispatch={dispatch}
                 selectedNodeId={selectedNodeId}
-                selectedNodeRef={selectedNodeRef}
+                // selectedNodeRef={selectedNodeRef}
                 handleAddButtonClick={handleAddButtonClick}
+                handleSelectedNodeChange={handleSelectedNodeChange}
               />
             </Box>
           </AccordionDetails>
