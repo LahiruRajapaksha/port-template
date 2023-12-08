@@ -1,4 +1,4 @@
-import { RenderTree } from "../components/Tree";
+import { RenderTree } from "../components/RecursiveTree/RecursiveTree";
 
 export enum TreeViewReducerActionTypes {
   ADD_TREE_NODE = "ADD_TREE_NODE",

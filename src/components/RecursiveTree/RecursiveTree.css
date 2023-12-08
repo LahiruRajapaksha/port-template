@@ -1,0 +1,42 @@
+.parentWrapper{
+    position: relative;  
+}
+
+.parentWrapper:after{
+    content:'';
+    position:absolute;
+    top:24px;
+    bottom:16px;
+    left:0;
+    width:1px;
+    background-color:rgb(136, 149, 151); 
+} 
+
+.parent .parentWrapper:only-child:after{
+    display: none;
+ }
+ .parent .parentWrapper:only-child>.parent:after{
+    display: none;
+ }
+
+.parent{
+    position: relative;   
+}
+.parent:after{ 
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: -20px;
+    width: 20px;
+    height: 1px;
+    background-color: rgb(136, 149, 151); 
+}
+.parent:before{ 
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 0px;
+    width: 1px;
+    bottom:16px;
+    background-color: rgb(136, 149, 151); 
+}

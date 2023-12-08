@@ -1,14 +1,10 @@
 import { Box, IconButton, Switch, Typography } from "@mui/material";
 import React from "react";
-import CustomTextField from "./TextField";
-import AddRemoveButton from "./AddRemoveButton";
+import CustomTextField from "../TextField";
+import AddRemoveButton from "../AddRemoveButton";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {
-  TreeViewReducerActionTypes,
-  TreeViewReducerActions,
-} from "../actions/treeViewReducerActions";
 import AddIcon from "@mui/icons-material/Add";
-import { TreeBox } from "./CustomBox";
+import "./RecursiveTree.css";
 
 export type RenderTree = {
   id: string;
@@ -19,8 +15,8 @@ export type RenderTree = {
 
 type RecursiveComponentProps = {
   data: RenderTree[];
-  dispatch: React.Dispatch<TreeViewReducerActions>;
   handleAddButtonClick: () => void;
+  handleDeleteButtonClick: () => void;
   level?: number;
   setselectedNodeId: React.Dispatch<React.SetStateAction<string>>;
   selectedNodeId: string;
@@ -32,49 +28,24 @@ const RecursiveComponent = (props: RecursiveComponentProps) => {
     level = 0,
     selectedNodeId,
     handleAddButtonClick,
+    handleDeleteButtonClick,
     setselectedNodeId,
-    dispatch,
   } = props;
 
-  const deleteNode = (
-    nodeData: RenderTree[],
-    selectedNode: string
-  ): RenderTree[] => {
-    return nodeData.filter((node) => {
-      if (node.id === selectedNode) {
-        return false;
-      } else if (node.children.length > 0) {
-        node.children = deleteNode(node.children, selectedNode);
-      }
-      return true;
-    });
+  const handleAddDataToNode = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target.value);
   };
-
-  const handleDeleteButtonClick = () => {
-    dispatch({
-      type: TreeViewReducerActionTypes.DELETE_TREE_NODE,
-      payload: deleteNode([...data], selectedNodeId),
-    });
-    setselectedNodeId("");
-  };
-
-  const handleAddDataToNode = debounce(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      console.log(event.target.value);
-    },
-    200
-  );
 
   return (
-    <Box ml={`${level * 20}px`}>
-      {/* <TreeBox> */}
+    <Box pl="20px" className="parentWrapper">
       {data.map((item) => (
-        <Box key={item.id}>
-          <Box display="flex" width={1} pl={1} pb={1} alignItems="center">
+        <Box key={item.id} className="parent">
+          <Box display="flex" width={1} mb={1} alignItems="center">
             <Box width="50%">
               <CustomTextField
                 onClick={() => setselectedNodeId(item.id)}
                 onChange={handleAddDataToNode}
+                defaultValue={item.id}
               />
             </Box>
 
@@ -117,14 +88,13 @@ const RecursiveComponent = (props: RecursiveComponentProps) => {
               data={item.children}
               level={level + 1}
               handleAddButtonClick={handleAddButtonClick}
+              handleDeleteButtonClick={handleDeleteButtonClick}
               setselectedNodeId={setselectedNodeId}
               selectedNodeId={selectedNodeId}
-              dispatch={dispatch}
             />
           )}
         </Box>
       ))}
-      {/* </TreeBox> */}
     </Box>
   );
 };

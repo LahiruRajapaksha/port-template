@@ -4,7 +4,9 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import RecursiveComponent, { RenderTree } from "../components/RecursiveTree";
+import RecursiveComponent, {
+  RenderTree,
+} from "../components/RecursiveTree/RecursiveTree";
 import {
   TreeViewInitState,
   TreeViewReducer,
@@ -39,6 +41,7 @@ export default function PortTemplate() {
       return node;
     });
   };
+  console.log("TreeData", treeData);
   const handleAddButtonClick = () => {
     const id = Math.ceil(Math.random() * 1000).toString();
     const newNode: RenderTree = {
@@ -62,6 +65,25 @@ export default function PortTemplate() {
           ? [...updatedNodes, newNode]
           : addNewNode(updatedNodes, newNode),
     });
+  };
+
+  const deleteNode = (nodeData: RenderTree[]): RenderTree[] => {
+    return nodeData.filter((node) => {
+      if (node.id === selectedNodeId) {
+        return false;
+      } else if (node.children.length > 0) {
+        node.children = deleteNode(node.children);
+      }
+      return true;
+    });
+  };
+
+  const handleDeleteButtonClick = () => {
+    dispatch({
+      type: TreeViewReducerActionTypes.DELETE_TREE_NODE,
+      payload: deleteNode([...treeData]),
+    });
+    setselectedNodeId("");
   };
 
   return (
@@ -109,13 +131,13 @@ export default function PortTemplate() {
               </AddRemoveButton>
             </Box>
           </Box>
-          <Box p={1}>
+          <Box mt={2} position="relative">
             <RecursiveComponent
               data={treeData}
               handleAddButtonClick={handleAddButtonClick}
+              handleDeleteButtonClick={handleDeleteButtonClick}
               setselectedNodeId={setselectedNodeId}
               selectedNodeId={selectedNodeId}
-              dispatch={dispatch}
             />
           </Box>
         </AccordionDetails>

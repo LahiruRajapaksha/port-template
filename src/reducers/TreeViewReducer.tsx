@@ -2,7 +2,7 @@ import {
   TreeViewReducerActionTypes,
   TreeViewReducerActions,
 } from "../actions/treeViewReducerActions";
-import { RenderTree } from "../components/Tree";
+import { RenderTree } from "../components/RecursiveTree/RecursiveTree";
 
 export type TreeViewState = {
   treeData: RenderTree[];
