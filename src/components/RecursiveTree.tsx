@@ -7,6 +7,8 @@ import {
   TreeViewReducerActionTypes,
   TreeViewReducerActions,
 } from "../actions/treeViewReducerActions";
+import AddIcon from "@mui/icons-material/Add";
+import { TreeBox } from "./CustomBox";
 
 export type RenderTree = {
   id: string;
@@ -56,17 +58,28 @@ const RecursiveComponent = (props: RecursiveComponentProps) => {
     setselectedNodeId("");
   };
 
+  const handleAddDataToNode = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      console.log(event.target.value);
+    },
+    200
+  );
+
   return (
     <Box ml={`${level * 20}px`}>
+      {/* <TreeBox> */}
       {data.map((item) => (
         <Box key={item.id}>
           <Box display="flex" width={1} pl={1} pb={1} alignItems="center">
-            <Box>
-              <CustomTextField onClick={() => setselectedNodeId(item.id)} />
+            <Box width="50%">
+              <CustomTextField
+                onClick={() => setselectedNodeId(item.id)}
+                onChange={handleAddDataToNode}
+              />
             </Box>
 
-            {((selectedNodeId === item.id && item.isButtonsVisible) ||
-              item.isButtonsVisible) && (
+            {(selectedNodeId === item.id ||
+              (selectedNodeId == "" && item.isButtonsVisible)) && (
               <Box display="flex" ml="auto" alignItems="center">
                 <Box
                   display="flex"
@@ -89,12 +102,12 @@ const RecursiveComponent = (props: RecursiveComponentProps) => {
                   </IconButton>
                 </Box>
                 <AddRemoveButton
-                  variant="contained"
+                  variant="outlined"
                   onClick={handleAddButtonClick}
                   padding={2}
                   margin="3px"
                 >
-                  +
+                  <AddIcon />
                 </AddRemoveButton>
               </Box>
             )}
@@ -111,6 +124,7 @@ const RecursiveComponent = (props: RecursiveComponentProps) => {
           )}
         </Box>
       ))}
+      {/* </TreeBox> */}
     </Box>
   );
 };

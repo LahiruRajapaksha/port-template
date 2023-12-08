@@ -8,7 +8,7 @@ const BootstrapInput = styled(InputBase)<InputBaseProps>(({ theme }) => ({
     position: "relative",
     border: "1px solid",
     borderColor: "#A2BCE0",
-    width: "50%",
+    width: "auto",
     fontSize: 16,
     padding: "10px 12px",
     height: 20,

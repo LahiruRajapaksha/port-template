@@ -4,13 +4,14 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import RecursiveComponent, { RenderTree } from "../components/NewTree";
+import RecursiveComponent, { RenderTree } from "../components/RecursiveTree";
 import {
   TreeViewInitState,
   TreeViewReducer,
 } from "../reducers/TreeViewReducer";
 import { TreeViewReducerActionTypes } from "../actions/treeViewReducerActions";
 import AddRemoveButton from "../components/AddRemoveButton";
+import AddIcon from "@mui/icons-material/Add";
 
 export default function PortTemplate() {
   const [expanded, setExpanded] = useState<boolean>(false);
@@ -53,9 +54,7 @@ export default function PortTemplate() {
         children: updateNodesRecursive(node.children),
       }));
     };
-
     const updatedNodes = updateNodesRecursive(treeData);
-
     dispatch({
       type: TreeViewReducerActionTypes.ADD_TREE_NODE,
       payload:
@@ -88,7 +87,7 @@ export default function PortTemplate() {
                 padding={2}
                 margin="3px"
               >
-                +
+                <AddIcon />
               </AddRemoveButton>
             </Box>
             <Box display="flex" justifyContent="space-between">
