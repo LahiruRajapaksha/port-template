@@ -1,4 +1,4 @@
-import { useState, useReducer, useRef } from "react";
+import { useState, useReducer } from "react";
 import { Box, Typography } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -6,21 +6,21 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import { TreeViewInitState, TreeViewReducer } from "./reducers/TreeViewReducer";
 import AddRemoveButton from "./components/AddRemoveButton";
-import CustomTree, { RenderTree } from "./components/Tree";
 import { TreeViewReducerActionTypes } from "./actions/treeViewReducerActions";
+import RecursiveComponent, { RenderTree } from "./components/NewTree";
 
 function App() {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [state, dispatch] = useReducer(TreeViewReducer, TreeViewInitState);
-  const { treeData, selectedNodeId } = state;
-  const selectedNodeRef = useRef<string>("");
+  const { treeData } = state;
+  const [selectedNodeId, setselectedNodeId] = useState("");
 
   const addNewNode = (
     nodeData: RenderTree[],
     newNode: RenderTree
   ): RenderTree[] => {
     return nodeData.map((node) => {
-      if (node.id === selectedNodeRef.current) {
+      if (node.id === selectedNodeId) {
         return {
           ...node,
           children: [...node.children, newNode],
@@ -35,12 +35,11 @@ function App() {
       return node;
     });
   };
-
-  const handleAddButtonClick = (selectedNode: string) => {
+  const handleAddButtonClick = () => {
     const id = Math.ceil(Math.random() * 1000).toString();
     const newNode: RenderTree = {
       id: id,
-      name: `Node ${id}`,
+      name: "",
       children: [],
       isButtonsVisible: true,
     };
@@ -58,40 +57,11 @@ function App() {
     dispatch({
       type: TreeViewReducerActionTypes.ADD_TREE_NODE,
       payload:
-        selectedNode === ""
+        selectedNodeId === ""
           ? [...updatedNodes, newNode]
           : addNewNode(updatedNodes, newNode),
     });
-    // dispatch({
-    //   type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
-    //   payload: "",
-    // });
-    // selectedNodeRef.current = "";
   };
-
-  const handleSelectedNodeChange = (nodeId: string) => {
-    selectedNodeRef.current = nodeId;
-  };
-  // const updateNodeNameData = (
-  //   nodeData: RenderTree[],
-  //   nodeId: string,
-  //   newTextValue: string
-  // ): RenderTree[] => {
-  //   return nodeData.map((node) => {
-  //     if (node.id === nodeId) {
-  //       return {
-  //         ...node,
-  //         name: newTextValue,
-  //       };
-  //     } else if (node.children.length > 0) {
-  //       return {
-  //         ...node,
-  //         children: updateNodeNameData(node.children, nodeId, newTextValue),
-  //       };
-  //     }
-  //     return node;
-  //   });
-  // };
 
   return (
     <Box width={1} display="flex" justifyContent="center" height={1} p={1}>
@@ -113,7 +83,7 @@ function App() {
               <Box mr="auto" display="flex">
                 <AddRemoveButton
                   variant="outlined"
-                  onClick={() => handleAddButtonClick(selectedNodeRef.current)}
+                  onClick={handleAddButtonClick}
                   padding={2}
                   margin="3px"
                 >
@@ -140,13 +110,19 @@ function App() {
               </Box>
             </Box>
             <Box p={1}>
-              <CustomTree
+              {/* <CustomTree
                 treeData={treeData}
                 dispatch={dispatch}
                 selectedNodeId={selectedNodeId}
-                // selectedNodeRef={selectedNodeRef}
                 handleAddButtonClick={handleAddButtonClick}
                 handleSelectedNodeChange={handleSelectedNodeChange}
+              /> */}
+              <RecursiveComponent
+                data={treeData}
+                handleAddButtonClick={handleAddButtonClick}
+                setselectedNodeId={setselectedNodeId}
+                selectedNodeId={selectedNodeId}
+                dispatch={dispatch}
               />
             </Box>
           </AccordionDetails>
