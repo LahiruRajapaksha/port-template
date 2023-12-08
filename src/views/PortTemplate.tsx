@@ -14,6 +14,7 @@ import {
 import { TreeViewReducerActionTypes } from "../actions/treeViewReducerActions";
 import AddRemoveButton from "../components/AddRemoveButton";
 import AddIcon from "@mui/icons-material/Add";
+import { debounce } from "../utils/utils";
 
 export default function PortTemplate() {
   const [expanded, setExpanded] = useState<boolean>(false);
@@ -41,7 +42,6 @@ export default function PortTemplate() {
       return node;
     });
   };
-  console.log("TreeData", treeData);
   const handleAddButtonClick = () => {
     const id = Math.ceil(Math.random() * 1000).toString();
     const newNode: RenderTree = {
@@ -85,6 +85,47 @@ export default function PortTemplate() {
     });
     setselectedNodeId("");
   };
+
+  const updateNode = (nodeData: RenderTree[], name: string): RenderTree[] => {
+    return nodeData.map((node) => {
+      if (node.id === selectedNodeId) {
+        return {
+          ...node,
+          name: name,
+        };
+      } else if (node.children.length > 0) {
+        return {
+          ...node,
+          children: updateNode(node.children, name),
+        };
+      }
+      return node;
+    });
+  };
+
+  const handleUpdateNode = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const updatedNodes = treeData.map((node) => {
+        if (node.id === selectedNodeId) {
+          return {
+            ...node,
+            name: event.target.value,
+          };
+        } else if (node.children.length > 0) {
+          return {
+            ...node,
+            children: updateNode(node.children, event.target.value),
+          };
+        }
+        return node;
+      });
+      dispatch({
+        type: TreeViewReducerActionTypes.UPDATE_TREE_NODE_NAME,
+        payload: updatedNodes,
+      });
+    },
+    500
+  );
 
   return (
     <Box
@@ -138,6 +179,7 @@ export default function PortTemplate() {
               handleDeleteButtonClick={handleDeleteButtonClick}
               setselectedNodeId={setselectedNodeId}
               selectedNodeId={selectedNodeId}
+              handleUpdateNode={handleUpdateNode}
             />
           </Box>
         </AccordionDetails>

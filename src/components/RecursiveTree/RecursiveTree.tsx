@@ -17,6 +17,7 @@ type RecursiveComponentProps = {
   data: RenderTree[];
   handleAddButtonClick: () => void;
   handleDeleteButtonClick: () => void;
+  handleUpdateNode: (event: React.ChangeEvent<HTMLInputElement>) => void;
   level?: number;
   setselectedNodeId: React.Dispatch<React.SetStateAction<string>>;
   selectedNodeId: string;
@@ -29,12 +30,9 @@ const RecursiveComponent = (props: RecursiveComponentProps) => {
     selectedNodeId,
     handleAddButtonClick,
     handleDeleteButtonClick,
+    handleUpdateNode,
     setselectedNodeId,
   } = props;
-
-  const handleAddDataToNode = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
-  };
 
   return (
     <Box pl="20px" className="parentWrapper">
@@ -44,8 +42,7 @@ const RecursiveComponent = (props: RecursiveComponentProps) => {
             <Box width="50%">
               <CustomTextField
                 onClick={() => setselectedNodeId(item.id)}
-                onChange={handleAddDataToNode}
-                defaultValue={item.id}
+                onChange={handleUpdateNode}
               />
             </Box>
 
@@ -91,6 +88,7 @@ const RecursiveComponent = (props: RecursiveComponentProps) => {
               handleDeleteButtonClick={handleDeleteButtonClick}
               setselectedNodeId={setselectedNodeId}
               selectedNodeId={selectedNodeId}
+              handleUpdateNode={handleUpdateNode}
             />
           )}
         </Box>
