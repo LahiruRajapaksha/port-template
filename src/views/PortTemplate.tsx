@@ -21,8 +21,7 @@ import templateData from "../port-template.json";
 export default function PortTemplate() {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [state, dispatch] = useReducer(TreeViewReducer, TreeViewInitState);
-  const { treeData } = state;
-  const [selectedNodeId, setselectedNodeId] = useState("");
+  const { treeData, selectedNodeId } = state;
 
   useEffect(() => {
     const setAttributesToNodes = (nodes: RenderTree[]): RenderTree[] => {
@@ -58,7 +57,6 @@ export default function PortTemplate() {
       return node;
     });
   };
-
   const handleAddButtonClick = () => {
     const id = Math.ceil(Math.random() * 1000).toString();
     const newNode: RenderTree = {
@@ -83,6 +81,15 @@ export default function PortTemplate() {
           ? [...updatedNodes, newNode]
           : addNewNode(updatedNodes, newNode),
     });
+    /**
+     *  I'm setting the selected node id to empty string becasue
+     * It needs to  show the buttons every time when a new node is added.
+     * Since updating the state is not affected by the state change of selectedNodeId
+     */
+    dispatch({
+      type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
+      payload: "",
+    });
   };
 
   const deleteNode = (nodeData: RenderTree[]): RenderTree[] => {
@@ -101,7 +108,10 @@ export default function PortTemplate() {
       type: TreeViewReducerActionTypes.DELETE_TREE_NODE,
       payload: deleteNode([...treeData]),
     });
-    setselectedNodeId("");
+    dispatch({
+      type: TreeViewReducerActionTypes.SET_SELECTED_NODE_ID,
+      payload: "",
+    });
   };
 
   const updateNode = (nodeData: RenderTree[], name: string): RenderTree[] => {
@@ -213,9 +223,9 @@ export default function PortTemplate() {
               data={treeData}
               handleAddButtonClick={handleAddButtonClick}
               handleDeleteButtonClick={handleDeleteButtonClick}
-              setselectedNodeId={setselectedNodeId}
               selectedNodeId={selectedNodeId}
               handleUpdateNode={handleUpdateNode}
+              dispatch={dispatch}
             />
           </Box>
         </AccordionDetails>
