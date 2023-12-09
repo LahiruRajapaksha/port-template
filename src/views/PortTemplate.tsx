@@ -1,4 +1,4 @@
-import { useState, useReducer } from "react";
+import { useState, useReducer, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -6,7 +6,6 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import RecursiveComponent, {
   RenderTree,
-  TreeData,
 } from "../components/RecursiveTree/RecursiveTree";
 import {
   TreeViewInitState,
@@ -17,12 +16,27 @@ import AddRemoveButton from "../components/AddRemoveButton";
 import AddIcon from "@mui/icons-material/Add";
 import { debounce } from "../utils/utils";
 import { saveAs } from "file-saver";
+import templateData from "../port-template.json";
 
 export default function PortTemplate() {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [state, dispatch] = useReducer(TreeViewReducer, TreeViewInitState);
   const { treeData } = state;
   const [selectedNodeId, setselectedNodeId] = useState("");
+
+  useEffect(() => {
+    const setAttributesToNodes = (nodes: RenderTree[]): RenderTree[] => {
+      return nodes.map((node) => ({
+        ...node,
+        isButtonsVisible: false,
+        children: setAttributesToNodes(node.children),
+      }));
+    };
+    dispatch({
+      type: TreeViewReducerActionTypes.INITIALIZE_TREE_DATA,
+      payload: setAttributesToNodes(templateData),
+    });
+  }, []);
 
   const addNewNode = (
     nodeData: RenderTree[],
@@ -108,7 +122,7 @@ export default function PortTemplate() {
   };
 
   const saveDataToFile = () => {
-    const cleanData = (nodes: RenderTree[]): TreeData[] => {
+    const cleanData = (nodes: RenderTree[]): RenderTree[] => {
       return nodes.map((node) => {
         const { isButtonsVisible, ...rest } = node;
         const children = cleanData(node.children);

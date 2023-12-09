@@ -6,16 +6,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import "./RecursiveTree.css";
 
-export type TreeData = {
-  id: string;
-  name: string;
-  children: TreeData[];
-};
-
 export type RenderTree = {
   id: string;
   name: string;
-  isButtonsVisible: boolean;
+  isButtonsVisible?: boolean;
   children: RenderTree[];
 };
 
@@ -50,11 +44,11 @@ const RecursiveComponent = (props: RecursiveComponentProps) => {
                 onClick={() => setselectedNodeId(item.id)}
                 onChange={handleUpdateNode}
                 disableUnderline
+                defaultValue={item.name}
               />
             </Box>
 
-            {(selectedNodeId === item.id ||
-              (selectedNodeId == "" && item.isButtonsVisible)) && (
+            {selectedNodeId === item.id && (
               <Box display="flex" ml="auto" alignItems="center">
                 <Box
                   display="flex"

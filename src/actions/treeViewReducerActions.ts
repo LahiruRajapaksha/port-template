@@ -5,6 +5,7 @@ export enum TreeViewReducerActionTypes {
   DELETE_TREE_NODE = "DELETE_TREE_NODE",
   SET_SELECTED_NODE_ID = "SET_SELECTED_NODE_ID",
   UPDATE_TREE_NODE_NAME = "UPDATE_TREE_NODE_NAME",
+  INITIALIZE_TREE_DATA = "INITIALIZE_TREE_DATA",
 }
 
 export type TreeViewReducerActions =
@@ -22,5 +23,9 @@ export type TreeViewReducerActions =
     }
   | {
       type: TreeViewReducerActionTypes.UPDATE_TREE_NODE_NAME;
+      payload: RenderTree[];
+    }
+  | {
+      type: TreeViewReducerActionTypes.INITIALIZE_TREE_DATA;
       payload: RenderTree[];
     };

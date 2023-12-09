@@ -20,6 +20,7 @@ export const TreeViewReducer = (
 ) => {
   switch (action.type) {
     case TreeViewReducerActionTypes.ADD_TREE_NODE:
+    case TreeViewReducerActionTypes.INITIALIZE_TREE_DATA:
       return {
         ...prevState,
         treeData: action.payload,
