@@ -6,6 +6,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import RecursiveComponent, {
   RenderTree,
+  TreeData,
 } from "../components/RecursiveTree/RecursiveTree";
 import {
   TreeViewInitState,
@@ -15,6 +16,7 @@ import { TreeViewReducerActionTypes } from "../actions/treeViewReducerActions";
 import AddRemoveButton from "../components/AddRemoveButton";
 import AddIcon from "@mui/icons-material/Add";
 import { debounce } from "../utils/utils";
+import { saveAs } from "file-saver";
 
 export default function PortTemplate() {
   const [expanded, setExpanded] = useState<boolean>(false);
@@ -42,6 +44,7 @@ export default function PortTemplate() {
       return node;
     });
   };
+
   const handleAddButtonClick = () => {
     const id = Math.ceil(Math.random() * 1000).toString();
     const newNode: RenderTree = {
@@ -50,6 +53,7 @@ export default function PortTemplate() {
       children: [],
       isButtonsVisible: true,
     };
+
     const updateNodesRecursive = (nodes: RenderTree[]): RenderTree[] => {
       return nodes.map((node) => ({
         ...node,
@@ -101,6 +105,24 @@ export default function PortTemplate() {
       }
       return node;
     });
+  };
+
+  const saveDataToFile = () => {
+    const cleanData = (nodes: RenderTree[]): TreeData[] => {
+      return nodes.map((node) => {
+        const { isButtonsVisible, ...rest } = node;
+        const children = cleanData(node.children);
+        return {
+          ...rest,
+          children,
+        };
+      });
+    };
+    const data = JSON.stringify(cleanData(treeData));
+    const file = new Blob([data], {
+      type: "text/plain;charset=utf-8",
+    });
+    saveAs(file, "port-template.json");
   };
 
   const handleUpdateNode = debounce(
@@ -164,7 +186,7 @@ export default function PortTemplate() {
               </AddRemoveButton>
               <AddRemoveButton
                 variant="contained"
-                onClick={() => null}
+                onClick={saveDataToFile}
                 padding={2}
                 margin="3px"
               >

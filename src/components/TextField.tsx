@@ -1,8 +1,7 @@
 import { alpha, styled } from "@mui/material/styles";
-import InputBase, { InputBaseProps } from "@mui/material/InputBase";
-import Box from "@mui/material/Box";
+import Input, { InputProps } from "@mui/material/Input";
 
-const BootstrapInput = styled(InputBase)<InputBaseProps>(({ theme }) => ({
+const CustomInput = styled(Input)<InputProps>(({ theme }) => ({
   "& .MuiInputBase-input": {
     borderRadius: 4,
     position: "relative",
@@ -19,7 +18,7 @@ const BootstrapInput = styled(InputBase)<InputBaseProps>(({ theme }) => ({
   },
 }));
 
-type CustomTextFieldProps = {
+type CustomTextFieldProps = InputProps & {
   defaultValue?: string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onClick?: () => void;
@@ -28,21 +27,12 @@ type CustomTextFieldProps = {
 const CustomTextField = (props: CustomTextFieldProps) => {
   const { defaultValue, onChange, onClick } = props;
   return (
-    <Box
-      component="form"
-      noValidate
-      sx={{
-        display: "grid",
-        gridTemplateColumns: { sm: "1fr 1fr" },
-        gap: 2,
-      }}
-    >
-      <BootstrapInput
-        defaultValue={defaultValue}
-        onChange={onChange}
-        onClick={onClick}
-      />
-    </Box>
+    <CustomInput
+      {...props}
+      defaultValue={defaultValue}
+      onChange={onChange}
+      onClick={onClick}
+    />
   );
 };
 

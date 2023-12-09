@@ -6,6 +6,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import "./RecursiveTree.css";
 
+export type TreeData = {
+  id: string;
+  name: string;
+  children: TreeData[];
+};
+
 export type RenderTree = {
   id: string;
   name: string;
@@ -43,6 +49,7 @@ const RecursiveComponent = (props: RecursiveComponentProps) => {
               <CustomTextField
                 onClick={() => setselectedNodeId(item.id)}
                 onChange={handleUpdateNode}
+                disableUnderline
               />
             </Box>
 
